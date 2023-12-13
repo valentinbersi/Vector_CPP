@@ -1,19 +1,19 @@
-#ifndef __VECTOR_H__
-#define __VECTOR_H__
+#ifndef VECTOR_HPP
+#define VECTOR_HPP
 
 #include <cstddef>
 #include <exception>
 
 class IndexException : public std::exception {
 public:
-    const char *what() const noexcept override {
+    [[nodiscard]] const char *what() const noexcept override {
         return "Index out of bounds";
     }
 };
 
 class EmptyException : public std::exception {
 public:
-    const char *what() const noexcept override {
+    [[nodiscard]] const char *what() const noexcept override {
         return "Vector is empty";
     }
 };
@@ -57,15 +57,15 @@ public:
 
     // Pre: -
     // Post: returns true if the vector is empty.
-    bool empty();
+    [[nodiscard("ignoring empty() return")]] bool empty();
 
     // Pre: -
     // Post: returns the number of elements in the vector.
-    size_t size();
+    [[nodiscard("ignoring size() return")]] size_t size();
 
     // Pre: vector can't be empty. Index must be less than the size of the vector.
     // Post: returns a reference of the element at the given index.
-    T &operator[](size_t index);
+    [[nodiscard("ignoring [] operator return")]] T &operator[](size_t index);
 
     // Destructor.
     ~Vector();
@@ -75,7 +75,7 @@ template<class T>
 void Vector<T>::resize() {
     T *data_aux = new T[capacity];
 
-    for (size_t i = 0; i < _size; i++) {
+    for (size_t i = 0; i < size(); i++) {
         data_aux[i] = data[i];
     }
 
@@ -98,53 +98,49 @@ void Vector<T>::add(T new_element) {
     if (empty()) {
         capacity = INITIAL_CAPACITY;
         data = new T[capacity];
-    } else if (_size == capacity) {
+    } else if (size() == capacity) {
         capacity *= RESIZE_FACTOR;
         resize();
     }
 
-    data[_size] = new_element;
+    data[size()] = new_element;
     _size++;
 }
 
 template<class T>
 void Vector<T>::add(T new_element, size_t index) {
 
-    if (index > _size) {
-        throw IndexException();
-    }
+    if (index > _size) throw IndexException();
 
     if (empty()) {
         capacity = INITIAL_CAPACITY;
         data = new T[capacity];
-    } else if (_size == capacity) {
+    } else if (size() == capacity) {
         capacity *= RESIZE_FACTOR;
         resize();
     }
 
-    for (size_t i = index; i < _size; i++) {
+    for (size_t i = index; i < size(); i++) {
         data[i + 1] = data[i];
     }
 
-    data[index] = data;
+    data[index] = new_element;
     _size++;
 }
 
 template<class T>
 T Vector<T>::remove() {
 
-    if (empty()) {
-        throw EmptyException();
-    }
+    if (empty()) throw EmptyException();
 
-    T valor_eliminado = data[_size - 1];
+    T valor_eliminado = data[size() - 1];
     _size--;
 
     if (empty()) {
         capacity = EMPTY;
         delete[] data;
         data = nullptr;
-    } else if (data / RESIZE_FACTOR == capacity) {
+    } else if (size() / RESIZE_FACTOR == capacity) {
         capacity /= RESIZE_FACTOR;
         resize();
     }
@@ -155,17 +151,13 @@ T Vector<T>::remove() {
 template<class T>
 T Vector<T>::remove(size_t indice) {
 
-    if (empty()) {
-        throw EmptyException();
-    }
+    if (empty()) throw EmptyException();
 
-    if (indice >= _size) {
-        throw IndexException();
-    }
+    if (indice >= size()) throw IndexException();
 
     T removed_element = data[indice];
 
-    for (size_t i = indice; i < _size - 1; i++) {
+    for (size_t i = indice; i < size() - 1; i++) {
         data[i] = data[i + 1];
     }
     _size--;
@@ -174,7 +166,7 @@ T Vector<T>::remove(size_t indice) {
         capacity = EMPTY;
         delete[] data;
         data = nullptr;
-    } else if (_size / RESIZE_FACTOR == capacity) {
+    } else if (size() / RESIZE_FACTOR == capacity) {
         capacity /= RESIZE_FACTOR;
         resize();
     }
@@ -193,12 +185,12 @@ size_t Vector<T>::size() {
 }
 
 template<class T>
-T &Vector<T>::operator[](size_t indice) {
-    if (indice >= _size) {
-        throw IndexException();
-    }
+T &Vector<T>::operator[](size_t index) {
+    if (empty()) throw EmptyException();
 
-    return data[indice];
+    if (index >= size()) throw IndexException();
+
+    return data[index];
 }
 
 template<class T>
@@ -209,4 +201,4 @@ Vector<T>::~Vector() {
     data = nullptr;
 }
 
-#endif
+#endif //VECTOR_HPP
