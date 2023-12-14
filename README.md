@@ -15,6 +15,6 @@
 
  - size(): returns the number of elements in the vector.
 
- - operator[](index): returns a reference of the element at the given index.
+ - operator[index]: returns a reference of the element at the given index.
 
 The vector uses a resize factor of 2, this means that when the number of elements reaches the capacity, it duplicates its size. Also, when the number of elements is half the capacity, it shrinks in half.
