@@ -1,5 +1,5 @@
 # Vector
- My implementation of an ADT Vector in C++.
+ My implementation of a Vector in C++.
 
  Manual:
 
